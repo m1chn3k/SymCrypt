@@ -140,6 +140,7 @@ int main() {
             if (errs < min_err_L1) {
                 min_err_L1 = errs;
                 best_L1 = i;
+                if (min_err_L1 < 535) break;
             }
         }
     }
@@ -164,6 +165,7 @@ int main() {
             if (errs < min_err_L2) {
                 min_err_L2 = errs;
                 best_L2 = i;
+                if (min_err_L2 < 545) break;
             }
         }
     }
