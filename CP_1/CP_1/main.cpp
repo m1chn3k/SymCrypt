@@ -5,6 +5,8 @@
 #include <fstream>
 #include <unordered_map>
 #include <iomanip>
+#include <algorithm>
+#include <Windows.h>
 
 using namespace std;
 
@@ -26,7 +28,7 @@ unordered_map<string, int> alf_with = {
 unordered_map<string, int> alf_no = {
     {"а", 0},  {"А", 0},  {"б", 1},  {"Б", 1},  {"в", 2},  {"В", 2},
     {"г", 3},  {"Г", 3},  {"д", 4},  {"Д", 4},  {"е", 5},  {"Е", 5},
-    {"ё", 5},  {"Ё", 5},  {"ж", 6},  {"Ж", 6},  {"з", 7},  {"З", 7},
+    {"ё", 5},  {"Ё", 5},  {"ж", 6},  {"З", 7},  {"з", 7},  {"З", 7},
     {"и", 8},  {"И", 8},  {"й", 9},  {"Й", 9},  {"к", 10}, {"К", 10},
     {"л", 11}, {"Л", 11}, {"м", 12}, {"М", 12}, {"н", 13}, {"Н", 13},
     {"о", 14}, {"О", 14}, {"п", 15}, {"П", 15}, {"р", 16}, {"Р", 16},
@@ -35,6 +37,16 @@ unordered_map<string, int> alf_no = {
     {"ч", 23}, {"Ч", 23}, {"ш", 24}, {"Ш", 24}, {"щ", 25}, {"Щ", 25},
     {"ъ", 26}, {"Ъ", 26}, {"ы", 27}, {"Ы", 27}, {"ь", 28}, {"Ь", 28},
     {"э", 29}, {"Э", 29}, {"ю", 30}, {"Ю", 30}, {"я", 31}, {"Я", 31}
+};
+
+string rev_with[] = {
+    "а","б","в","г","д","е","ж","з","и","й","к","л","м","н","о","п",
+    "р","с","т","у","ф","х","ц","ч","ш","щ","ъ","ы","ь","э","ю","я"," "
+};
+
+string rev_no[] = {
+    "а","б","в","г","д","е","ж","з","и","й","к","л","м","н","о","п",
+    "р","с","т","у","ф","х","ц","ч","ш","щ","ъ","ы","ь","э","ю","я"
 };
 
 double calc_h(const vector<long long>& f, int n) {
@@ -51,8 +63,25 @@ double calc_h(const vector<long long>& f, int n) {
     return h / n;
 }
 
+void print_top_monograms(const vector<long long>& f, string rev[], int size) {
+    vector<pair<long long, string>> temp;
+    for (int i = 0; i < size; ++i) {
+        if (f[i] > 0) temp.push_back({ f[i], rev[i] });
+    }
+    sort(temp.rbegin(), temp.rend());
+
+    cout << "Top letters (sorted by frequency):\n";
+    for (const auto& p : temp) {
+        cout << "'" << p.second << "': " << p.first << "  ";
+    }
+    cout << "\n\n";
+}
+
 int main() {
-    ifstream file("Anno_Hideaki_Evangelion__Ranobе.txt", ios::binary);
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+
+    ifstream file("Anno_Hideaki_Evangelion__Ranobe.txt", ios::binary);
     if (!file.is_open()) {
         cout << "1000-7" << endl;
         return 1;
@@ -114,20 +143,22 @@ int main() {
         }
     }
 
+    cout << fixed << setprecision(5);
+
+    cout << "=== WITH SPACES ===\n";
+    print_top_monograms(f1_w, rev_with, 33);
     double h1_w = calc_h(f1_w, 1);
     double h2_w_o = calc_h(f2_w_o, 2);
     double h2_w_no = calc_h(f2_w_no, 2);
-    double h1_n = calc_h(f1_n, 1);
-    double h2_n_o = calc_h(f2_n_o, 2);
-    double h2_n_no = calc_h(f2_n_no, 2);
-
-    cout << fixed << setprecision(5);
-    cout << "with spaces:\n";
     cout << "h1: " << h1_w << " r: " << (1.0 - (h1_w / log2(33))) * 100.0 << "%\n";
     cout << "h2 (overlap): " << h2_w_o << " r: " << (1.0 - (h2_w_o / log2(33))) * 100.0 << "%\n";
     cout << "h2 (no overlap): " << h2_w_no << " r: " << (1.0 - (h2_w_no / log2(33))) * 100.0 << "%\n\n";
 
-    cout << "no spaces:\n";
+    cout << "=== NO SPACES ===\n";
+    print_top_monograms(f1_n, rev_no, 32);
+    double h1_n = calc_h(f1_n, 1);
+    double h2_n_o = calc_h(f2_n_o, 2);
+    double h2_n_no = calc_h(f2_n_no, 2);
     cout << "h1: " << h1_n << " r: " << (1.0 - (h1_n / log2(32))) * 100.0 << "%\n";
     cout << "h2 (overlap): " << h2_n_o << " r: " << (1.0 - (h2_n_o / log2(32))) * 100.0 << "%\n";
     cout << "h2 (no overlap): " << h2_n_no << " r: " << (1.0 - (h2_n_no / log2(32))) * 100.0 << "%\n";
