@@ -123,7 +123,6 @@ vector<int> decrypt_affine(const vector<int>& cipher, long long a, long long b) 
     long long a_inv = modInverse(a, 961);
     if (a_inv == -1) return vector<int>();
 
-    // Оптимізація: заздалегідь виділяємо фіксований розмір під вектор
     vector<int> plain(cipher.size());
 
     for (size_t i = 0; i + 1 < cipher.size(); i += 2) {
@@ -214,7 +213,6 @@ int main() {
                             for (int c : dec) out << rev_alf[c];
                             out.close();
 
-                            // Оптимізація: миттєво завершуємо програму після знаходження істинного ключа
                             return 0;
                         }
                     }
