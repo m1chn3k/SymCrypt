@@ -120,15 +120,17 @@ vector<int> get_top_5_bigrams(const vector<int>& txt) {
 }
 
 vector<int> decrypt_affine(const vector<int>& cipher, long long a, long long b) {
-    vector<int> plain;
     long long a_inv = modInverse(a, 961);
-    if (a_inv == -1) return plain;
+    if (a_inv == -1) return vector<int>();
+
+    // Оптимізація: заздалегідь виділяємо фіксований розмір під вектор
+    vector<int> plain(cipher.size());
 
     for (size_t i = 0; i + 1 < cipher.size(); i += 2) {
         long long Y = cipher[i] * 31 + cipher[i + 1];
         long long X = (a_inv * (Y - b + 961)) % 961;
-        plain.push_back(X / 31);
-        plain.push_back(X % 31);
+        plain[i] = X / 31;
+        plain[i + 1] = X % 31;
     }
     return plain;
 }
@@ -178,8 +180,6 @@ int main() {
 
     cout << "Bruteforcing keys...\n";
 
-    bool found = false;
-
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 5; j++) {
             if (i == j) continue;
@@ -214,7 +214,8 @@ int main() {
                             for (int c : dec) out << rev_alf[c];
                             out.close();
 
-                            found = true;
+                            // Оптимізація: миттєво завершуємо програму після знаходження істинного ключа
+                            return 0;
                         }
                     }
                 }
@@ -222,9 +223,6 @@ int main() {
         }
     }
 
-    if (!found) {
-        cout << "Key not found. Mozhno poprobovat pomeyat 'ы' i 'ь' mestami.\n";
-    }
-
+    cout << "Key not found. Mozhno poprobovat pomeyat 'ы' i 'ь' mestami.\n";
     return 0;
 }
